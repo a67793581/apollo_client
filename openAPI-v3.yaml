@@ -1,0 +1,754 @@
+openapi: 3.0.0
+#信息
+info:
+  title: 阿波罗客户端
+  description: 阿波罗客户端
+  version: v0.0.2
+#服务
+servers:
+  -  url: http://config-admin.test.huajiao.com/openapi/v1
+     description: 域名
+#鉴权
+security:
+  - ApiKeyAuth: []
+#定义
+components:
+  #模型
+  schemas:
+    lock:
+      type: "object"
+      properties:
+        namespaceName:
+          type: string
+        lockedBy:
+          type: string
+        isLocked:
+          type: boolean
+    namespaceBase:
+      type: "object"
+      properties:
+        name:
+          type: string
+        appId:
+          type: string
+        comment:
+          type: string
+        format:
+          type: string
+        isPublic:
+          type: boolean
+        dataChangeCreatedBy:
+          type: string
+    namespaceInfo:
+      type: "object"
+      properties:
+        name:
+          type: string
+        appId:
+          type: string
+        comment:
+          type: string
+        format:
+          type: string
+        isPublic:
+          type: boolean
+        dataChangeCreatedBy:
+          type: string
+        dataChangeLastModifiedBy:
+          type: string
+        dataChangeCreatedTime:
+          type: string
+        dataChangeLastModifiedTime:
+          type: string
+    namespace:
+      type: "object"
+      properties:
+        appId:
+          type: string
+        clusterName:
+          type: string
+        namespaceName:
+          type: string
+        comment:
+          type: string
+        format:
+          type: string
+        isPublic:
+          type: boolean
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/field'
+        dataChangeCreatedBy:
+          type: string
+        dataChangeLastModifiedBy:
+          type: string
+        dataChangeCreatedTime:
+          type: string
+        dataChangeLastModifiedTime:
+          type: string
+    field:
+      type: "object"
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+        dataChangeCreatedBy:
+          type: string
+        dataChangeLastModifiedBy:
+          type: string
+        dataChangeCreatedTime:
+          type: string
+        dataChangeLastModifiedTime:
+          type: string
+    fieldBase:
+      type: "object"
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+        comment:
+          type: string
+        dataChangeCreatedBy:
+          type: string
+    fieldPut:
+      type: "object"
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+        comment:
+          type: string
+        dataChangeLastModifiedBy:
+          type: string
+        dataChangeCreatedBy:
+          type: string
+    releasesPost:
+      type: "object"
+      properties:
+        releaseTitle:
+          type: string
+        releaseComment:
+          type: string
+        releasedBy:
+          type: string
+    releases:
+      type: "object"
+      properties:
+        appId:
+          type: string
+        clusterName:
+          type: string
+        namespaceName:
+          type: string
+        name:
+          type: string
+        configurations:
+          type: "object"
+          properties:
+            timeout:
+              type: string
+        comment:
+          type: string
+        dataChangeCreatedBy:
+          type: string
+        dataChangeLastModifiedBy:
+          type: string
+        dataChangeCreatedTime:
+          type: string
+        dataChangeLastModifiedTime:
+          type: string
+    clusterInfo:
+      type: "object"
+      properties:
+        name:
+          type: string
+        appId:
+          type: string
+        dataChangeCreatedBy:
+          type: string
+        dataChangeLastModifiedBy:
+          type: string
+        dataChangeCreatedTime:
+          type: string
+        dataChangeLastModifiedTime:
+          type: string
+    clusterInfoBase:
+      type: "object"
+      properties:
+        name:
+          type: string
+        appId:
+          type: string
+        dataChangeCreatedBy:
+          type: string
+    appInfo:
+      type: "object"
+      xml:
+        name: "appInfo"
+      properties:
+        name:
+          type: string
+        appId:
+          type: string
+        orgId:
+          type: string
+        orgName:
+          type: string
+        ownerName:
+          type: string
+        ownerEmail:
+          type: string
+        dataChangeCreatedBy:
+          type: string
+        dataChangeLastModifiedBy:
+          type: string
+        dataChangeCreatedTime:
+          type: string
+        dataChangeLastModifiedTime:
+          type: string
+    envCluster:
+      type: "object"
+      xml:
+        name: "envCluster"
+      properties:
+        clusters:
+          type: "array"
+          xml:
+            name: "clusters"
+            wrapped: true
+          items:
+            type: string
+        env:
+          type: string
+  #授权
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+  #响应
+  responses:
+    UnauthorizedError:
+      description: 接口传入的token非法或者已过期，客户端需要检查token是否传入正确。
+      headers:
+        Authorization:
+          schema:
+            type: string
+#接口
+paths:
+  /apps/{appId}/envclusters:
+    get:
+      operationId: getEnvClustersById
+      summary: "获取App的环境，集群信息"
+      description: >
+        获取App的环境，集群信息
+      responses:
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '200':
+          description: 说明
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/envCluster'
+      parameters:
+        - name: appId
+          in: path
+          description: 应用id
+          required: true
+          schema:
+            type: string
+  /apps:
+    get:
+      operationId: getAppInfo
+      summary: "获取App信息"
+      description: >
+        获取App信息
+      responses:
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '200':
+          description: 说明
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/appInfo'
+  /envs/{env}/apps/{appId}/clusters/{clusterName}/namespaces/{namespaceName}/items/{key}:
+    put:
+      summary: 修改配置接口
+      description: 修改配置接口
+      operationId: putField
+      parameters:
+        - in: query
+          name: createIfNotExists
+          description: 当配置不存在时是否自动创建
+          required: false
+          schema:
+            type: boolean
+          allowReserved: true
+      requestBody:
+        description: 携带参数
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/fieldPut'
+      responses:
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '200':
+          description: 该接口没有返回值
+    delete:
+      summary: 删除配置接口
+      description: 删除配置接口
+      operationId: deleteField
+      parameters:
+        - in: query
+          name: operator
+          description: 删除配置的操作者，域账号
+          required: true
+          schema:
+            type: string
+          allowReserved: true
+      responses:
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '200':
+          description: 该接口没有返回值
+    get:
+      summary: 读取配置接口
+      description: 读取配置接口
+      operationId: getField
+      responses:
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '200':
+          description: 说明
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/field'
+    parameters:
+      - name: appId
+        in: path
+        description: 应用id
+        required: true
+        schema:
+          type: string
+      - name: env
+        in: path
+        description: 环境
+        required: true
+        schema:
+          type: string
+      - name: clusterName
+        in: path
+        description: 集群名称
+        required: true
+        schema:
+          type: string
+      - name: namespaceName
+        in: path
+        description: 命名空间名称
+        required: true
+        schema:
+          type: string
+      - name: key
+        in: path
+        description: 字段名
+        required: true
+        schema:
+          type: string
+  /envs/{env}/apps/{appId}/clusters/{clusterName}/namespaces/{namespaceName}/items:
+    post:
+      summary: 新增配置接口
+      description: 新增配置接口
+      operationId: postField
+      requestBody:
+        description: post携带参数
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/fieldBase'
+      responses:
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '200':
+          description: 说明
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/field'
+      parameters:
+        - name: appId
+          in: path
+          description: 应用id
+          required: true
+          schema:
+            type: string
+        - name: env
+          in: path
+          description: 环境
+          required: true
+          schema:
+            type: string
+        - name: clusterName
+          in: path
+          description: 集群名称
+          required: true
+          schema:
+            type: string
+        - name: namespaceName
+          in: path
+          description: 命名空间名称
+          required: true
+          schema:
+            type: string
+  /envs/{env}/releases/{releaseId}/rollback:
+    put:
+      summary: 回滚已发布配置接口
+      description: 回滚已发布配置接口
+      operationId: rollback
+      responses:
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '200':
+          description: 说明
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/releases'
+      parameters:
+        - in: query
+          name: operator
+          description: 删除配置的操作者，域账号
+          required: true
+          schema:
+            type: string
+        - name: releaseId
+          in: path
+          description: 发布记录id
+          required: true
+          schema:
+            type: string
+        - name: env
+          in: path
+          description: 环境
+          required: true
+          schema:
+            type: string
+  /envs/{env}/apps/{appId}/clusters/{clusterName}/namespaces/{namespaceName}/releases/latest:
+    get:
+      summary: 获取生效配置接口
+      description: 获取某个Namespace当前生效的已发布配置接口
+      operationId: getReleases
+      responses:
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '200':
+          description: 说明
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/releases'
+      parameters:
+        - name: appId
+          in: path
+          description: 应用id
+          required: true
+          schema:
+            type: string
+        - name: env
+          in: path
+          description: 环境
+          required: true
+          schema:
+            type: string
+        - name: clusterName
+          in: path
+          description: 集群名称
+          required: true
+          schema:
+            type: string
+        - name: namespaceName
+          in: path
+          description: 命名空间名称
+          required: true
+          schema:
+            type: string
+  /envs/{env}/apps/{appId}/clusters/{clusterName}/namespaces/{namespaceName}/releases:
+    post:
+      summary: 发布配置接口
+      description: 发布配置接口
+      operationId: postReleases
+      requestBody:
+        description: post携带参数
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/releasesPost'
+      responses:
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '200':
+          description: 说明
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/releases'
+      parameters:
+        - name: appId
+          in: path
+          description: 应用id
+          required: true
+          schema:
+            type: string
+        - name: env
+          in: path
+          description: 环境
+          required: true
+          schema:
+            type: string
+        - name: clusterName
+          in: path
+          description: 集群名称
+          required: true
+          schema:
+            type: string
+        - name: namespaceName
+          in: path
+          description: 命名空间名称
+          required: true
+          schema:
+            type: string
+  /envs/{env}/apps/{appId}/clusters/{clusterName}/namespaces/{namespaceName}/lock:
+    get:
+      operationId: getLock
+      summary: "获取某个Namespace当前编辑人接口"
+      description: >
+        Apollo在生产环境（PRO）有限制规则：每次发布只能有一个人编辑配置，且该次发布的人不能是该次发布的编辑人。<br>
+        也就是说如果一个用户A修改了某个namespace的配置，那么在这个namespace发布前，只能由A修改，其它用户无法修改。<br>
+        同时，该用户A无法发布自己修改的配置，必须找另一个有发布权限的人操作。<br>
+        这个接口就是用来获取当前namespace是否有人锁定的接口。在非生产环境（FAT、UAT），该接口始终返回没有人锁定。<br>
+      responses:
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '200':
+          description: 说明
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/lock'
+      parameters:
+        - name: appId
+          in: path
+          description: 应用id
+          required: true
+          schema:
+            type: string
+        - name: env
+          in: path
+          description: 环境
+          required: true
+          schema:
+            type: string
+        - name: clusterName
+          in: path
+          description: 集群名称
+          required: true
+          schema:
+            type: string
+        - name: namespaceName
+          in: path
+          description: 命名空间名称
+          required: true
+          schema:
+            type: string
+  /envs/{env}/apps/{appId}/clusters/{clusterName}/namespaces/{namespaceName}:
+    get:
+      operationId: getNamespace
+      summary: "获取某个Namespace信息接口"
+      description: >
+        获取某个Namespace信息接口
+      responses:
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '200':
+          description: 说明
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/namespace'
+      parameters:
+        - name: appId
+          in: path
+          description: 应用id
+          required: true
+          schema:
+            type: string
+        - name: env
+          in: path
+          description: 环境
+          required: true
+          schema:
+            type: string
+        - name: clusterName
+          in: path
+          description: 集群名称
+          required: true
+          schema:
+            type: string
+        - name: namespaceName
+          in: path
+          description: 命名空间名称
+          required: true
+          schema:
+            type: string
+  /envs/{env}/apps/{appId}/clusters/{clusterName}/namespaces:
+    get:
+      operationId: getNamespaces
+      summary: "获取集群下所有Namespace信息接口"
+      description: >
+        获取集群下所有Namespace信息接口
+      responses:
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '200':
+          description: 说明
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/namespace'
+      parameters:
+        - name: appId
+          in: path
+          description: 应用id
+          required: true
+          schema:
+            type: string
+        - name: env
+          in: path
+          description: 环境
+          required: true
+          schema:
+            type: string
+        - name: clusterName
+          in: path
+          description: 集群名称
+          required: true
+          schema:
+            type: string
+  /apps/{appId}/appnamespaces:
+    post:
+      operationId: postNamespace
+      summary: "创建Namespace"
+      description: >
+        可以通过此接口创建Namespace，调用此接口需要授予第三方APP对目标APP的管理权限。
+      requestBody:
+        description: post携带参数
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/namespaceBase'
+      responses:
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '200':
+          description: >
+            如果是properties文件，name = ${appId所属的部门}.${传入的name值} ，<br>
+            例如调用接口传入的name=xy-z, format=properties，应用的部门为框架（FX）,那么name=FX.xy-z <br>
+            如果不是properties文件 name = ${appId所属的部门}.${传入的name值}.${format}，<br>
+            例如调用接口传入的name=xy-z, format=json，应用的部门为框架（FX）,那么name=FX.xy-z.json<br>
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/namespaceInfo'
+      parameters:
+        - name: appId
+          in: path
+          description: 应用id
+          required: true
+          schema:
+            type: string
+  /envs/{env}/apps/{appId}/clusters/{clusterName}:
+    get:
+      operationId: getClusters
+      summary: "获取集群接口"
+      description: >
+        获取集群接口
+      responses:
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '200':
+          description: 说明
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/clusterInfo'
+      parameters:
+        - name: appId
+          in: path
+          description: 应用id
+          required: true
+          schema:
+            type: string
+        - name: env
+          in: path
+          description: 环境
+          required: true
+          schema:
+            type: string
+        - name: clusterName
+          in: path
+          description: 集群名称
+          required: true
+          schema:
+            type: string
+  /envs/{env}/apps/{appId}/clusters:
+    post:
+      operationId: postClusters
+      summary: "创建集群接口"
+      description: >
+        可以通过此接口创建集群，调用此接口需要授予第三方APP对目标APP的管理权限。
+      requestBody:
+        description: post携带参数
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/clusterInfoBase'
+      responses:
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '200':
+          description: 说明
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/clusterInfo'
+      parameters:
+        - name: appId
+          in: path
+          description: 应用id
+          required: true
+          schema:
+            type: string
+        - name: env
+          in: path
+          description: 环境
+          required: true
+          schema:
+            type: string
