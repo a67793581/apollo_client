@@ -7,7 +7,8 @@
         "php",
         "sdk",
         "api",
-        "apollo-open-api"
+        "apollo-open-api",
+        "开放平台"
     ],
     "homepage": "http://swagger.io",
     "license": "proprietary",
