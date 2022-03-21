@@ -1,7 +1,8 @@
 {
     "name": "carlo/apollo_client",
-    "description": "",
+    "description": "apollo-open-api php版阿波罗第三方平台接入sdk PHP Apollo third-party platform access SDK",
     "keywords": [
+        "apollo",
         "swagger",
         "php",
         "sdk",
