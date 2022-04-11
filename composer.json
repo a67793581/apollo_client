@@ -10,9 +10,13 @@
         "apollo-open-api",
         "开放平台"
     ],
-    "homepage": "http://swagger.io",
-    "license": "proprietary",
+    "homepage": "https://github.com/a67793581/apollo_client",
+    "license": "MIT",
     "authors": [
+        {
+            "name": "carlo",
+            "email": "284474102@qq.com"
+        },
         {
             "name": "Swagger and contributors",
             "homepage": "https://github.com/swagger-api/swagger-codegen"
